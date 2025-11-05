@@ -1,0 +1,107 @@
+# OS
+.DS_Store
+.DS_Store?
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Git
+.git-credentials
+*.orig
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.code-workspace
+.vs/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+
+# Node / JavaScript
+node_modules/
+jspm_packages/
+bower_components/
+dist/
+build/
+.cache/
+.parcel-cache/
+.nyc_output/
+coverage/
+.next/
+.nuxt/
+.vercel/
+.svelte-kit/
+.storybook-out/
+
+# TypeScript
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.venv/
+venv/
+env/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.nox/
+.dist/
+.eggs/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+.coverage*
+.hypothesis/
+
+# Java / Kotlin (Gradle/Maven)
+.gradle/
+build/
+out/
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# .NET
+bin/
+obj/
+*.user
+*.rsuser
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Misc
+*.swp
+*.swo
+*.tmp
+*.temp
+~$*
+.ipynb_checkpoints/
