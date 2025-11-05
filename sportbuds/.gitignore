@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# OS
+.DS_Store
+
+# Build artifacts
+# Generic
+build/
+dist/
+coverage/
+.cache/
+
+# Framework-specific (safe to ignore if unused)
+.next/
+.nuxt/
+.vercel/
+.svelte-kit/
+.parcel-cache/
+.nyc_output/
