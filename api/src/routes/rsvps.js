@@ -1,0 +1,14 @@
+const express = require('express');
+const router = express.Router();
+const rsvpsController = require('../controllers/rsvps');
+
+// Get all RSVPs for an event
+router.get('/events/:eventId/rsvps', rsvpsController.getEventRsvps);
+
+// RSVP to an event
+router.post('/events/:eventId/rsvps', rsvpsController.createRsvp);
+
+// Cancel current user's RSVP
+router.delete('/events/:eventId/rsvps/me', rsvpsController.cancelMyRsvp);
+
+module.exports = router;

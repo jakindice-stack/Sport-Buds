@@ -1,0 +1,342 @@
+openapi: 3.0.3
+info:
+  title: Sport Buds API
+  version: 1.0.0
+  description: |
+    REST API for the Sport Buds MVP web application.
+    The API exposes CRUD endpoints for:
+      - User profiles
+      - Sports events
+      - RSVPs
+      - Host ratings
+      - Event reports
+    All operations are performed via this API; the client never talks to the database directly.
+
+servers:
+  - url: /api
+    description: Local / reverse-proxy base path
+
+tags:
+  - name: Profiles
+    description: Manage user profiles (linked 1:1 with auth.users)
+  - name: Events
+    description: Manage sports events
+  - name: RSVPs
+    description: Manage RSVPs for events
+  - name: Ratings
+    description: Manage host ratings
+  - name: Reports
+    description: Report unsafe or inappropriate events or users
+
+paths:
+  /profiles:
+    get:
+      tags: [Profiles]
+      summary: List profiles
+      parameters:
+        - in: query
+          name: sport_interest
+          schema: { type: string }
+        - in: query
+          name: skill_level
+          schema: { type: string }
+        - in: query
+          name: location
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [Profiles]
+      summary: Create profile for current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProfileCreate' }
+      responses:
+        '201': { description: Created }
+
+  /profiles/me:
+    get:
+      tags: [Profiles]
+      summary: Get current user's profile
+      responses:
+        '200': { description: OK }
+    patch:
+      tags: [Profiles]
+      summary: Update current user's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProfileUpdate' }
+      responses:
+        '200': { description: OK }
+
+  /profiles/{profileId}:
+    get:
+      tags: [Profiles]
+      summary: Get profile by ID
+      parameters:
+        - in: path
+          name: profileId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+
+  /events:
+    get:
+      tags: [Events]
+      summary: List events
+      parameters:
+        - in: query
+          name: sport_type
+          schema: { type: string }
+        - in: query
+          name: skill_level
+          schema: { type: string }
+        - in: query
+          name: date_from
+          schema: { type: string, format: date }
+        - in: query
+          name: date_to
+          schema: { type: string, format: date }
+        - in: query
+          name: location
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Events]
+      summary: Create event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EventCreate' }
+      responses:
+        '201': { description: Created }
+
+  /events/{eventId}:
+    get:
+      tags: [Events]
+      summary: Get event by ID
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: OK }
+    patch:
+      tags: [Events]
+      summary: Update event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EventUpdate' }
+      responses:
+        '200': { description: OK }
+    delete:
+      tags: [Events]
+      summary: Delete event
+      responses:
+        '204': { description: Deleted }
+
+  /events/{eventId}/rsvps:
+    get:
+      tags: [RSVPs]
+      summary: List RSVPs for event
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [RSVPs]
+      summary: RSVP to event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RsvpCreate' }
+      responses:
+        '201': { description: Created }
+
+  /events/{eventId}/rsvps/me:
+    delete:
+      tags: [RSVPs]
+      summary: Cancel current user RSVP
+      responses:
+        '204': { description: Deleted }
+
+  /events/{eventId}/ratings:
+    get:
+      tags: [Ratings]
+      summary: List event ratings
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Ratings]
+      summary: Submit or update rating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RatingCreate' }
+      responses:
+        '200': { description: OK }
+
+  /hosts/{hostId}/ratings:
+    get:
+      tags: [Ratings]
+      summary: Get host rating summary
+      responses:
+        '200': { description: OK }
+
+  /events/{eventId}/reports:
+    post:
+      tags: [Reports]
+      summary: Submit event report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReportCreate' }
+      responses:
+        '201': { description: Created }
+
+  /reports:
+    get:
+      tags: [Reports]
+      summary: List reports
+      responses:
+        '200': { description: OK }
+
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        name: { type: string }
+        profile_photo_url: { type: string, nullable: true }
+        sport_interest: { type: string, nullable: true }
+        skill_level: { type: string, nullable: true }
+        location: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ProfileCreate:
+      type: object
+      required: [email, name]
+      properties:
+        email: { type: string }
+        name: { type: string }
+        sport_interest: { type: string, nullable: true }
+        skill_level: { type: string, nullable: true }
+        location: { type: string, nullable: true }
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        sport_interest: { type: string }
+        skill_level: { type: string }
+        location: { type: string }
+
+    Event:
+      type: object
+      properties:
+        event_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        title: { type: string }
+        sport_type: { type: string }
+        location: { type: string }
+        skill_level: { type: string, nullable: true }
+        event_date: { type: string, format: date }
+        start_time: { type: string, format: date-time }
+        event_duration: { type: integer }
+        event_capacity: { type: integer, nullable: true }
+
+    EventCreate:
+      type: object
+      required: [title, sport_type, location, event_date, start_time, event_duration]
+      properties:
+        title: { type: string }
+        sport_type: { type: string }
+        location: { type: string }
+        skill_level: { type: string, nullable: true }
+        event_date: { type: string, format: date }
+        start_time: { type: string, format: date-time }
+        event_duration: { type: integer }
+        event_capacity: { type: integer, nullable: true }
+
+    EventUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        sport_type: { type: string }
+        location: { type: string }
+        skill_level: { type: string }
+        event_date: { type: string, format: date }
+        start_time: { type: string, format: date-time }
+        event_duration: { type: integer }
+        event_capacity: { type: integer }
+
+    Rsvp:
+      type: object
+      properties:
+        user_id: { type: string, format: uuid }
+        event_id: { type: string, format: uuid }
+        email: { type: string, nullable: true }
+        phone_number: { type: string, nullable: true }
+
+    RsvpCreate:
+      type: object
+      properties:
+        email: { type: string, nullable: true }
+        phone_number: { type: string, nullable: true }
+
+    Rating:
+      type: object
+      properties:
+        rating_id: { type: string, format: uuid }
+        star_rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+
+    RatingCreate:
+      type: object
+      required: [star_rating]
+      properties:
+        star_rating:
+          type: number
+          minimum: 0
+          maximum: 5
+
+    Report:
+      type: object
+      properties:
+        report_id: { type: string, format: uuid }
+        reporter_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid, nullable: true }
+        comment: { type: string }
+
+    ReportCreate:
+      type: object
+      required: [comment]
+      properties:
+        comment: { type: string }
+        user_id: { type: string, format: uuid, nullable: true }
+
+    Error:
+      type: object
+      properties:
+        message: { type: string }
+
+security:
+  - bearerAuth: []
