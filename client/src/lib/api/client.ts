@@ -1,16 +1,8 @@
-import type {
-  AuthError,
-  AuthResponse,
-  AuthTokenResponsePassword,
-  PostgrestError,
-  UserResponse,
-} from '@supabase/supabase-js'
-
-import { supabase } from '@/lib/supabase'
+import { http } from '@/lib/api/http'
 import type { Database } from '@/types/supabase'
 
-export type ApiError = PostgrestError | AuthError | Error
-export type ApiResult<T> = Promise<{ data: T; error: ApiError | null }>
+export type ApiError = Error
+export type ApiResult<T> = Promise<{ data: T | null; error: ApiError | null }>
 
 type Tables = Database['public']['Tables']
 export type ProfileRow = Tables['profiles']['Row']
@@ -28,145 +20,107 @@ type ReportInsert = Tables['reports']['Insert']
 type EventFilters = {
   sport?: string
   skill_level?: EventRow['skill_level']
+  date_from?: string
+  date_to?: string
+  location?: string
 }
 
-const auth = {
-  signIn: async (email: string, password: string): ApiResult<AuthTokenResponsePassword['data']> => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    return { data, error }
-  },
-  signInWithOtp: async (email: string): ApiResult<AuthResponse['data']> => {
-    const { data, error } = await supabase.auth.signInWithOtp({ email })
-    return { data, error }
-  },
-  signUp: async (email: string, password: string, fullName: string): ApiResult<AuthResponse['data']> => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    })
+const toResult = async <T>(executor: () => Promise<T>): ApiResult<T> => {
+  try {
+    const data = await executor()
+    return { data, error: null }
+  } catch (error) {
+    return { data: null, error: error as ApiError }
+  }
+}
 
-    return { data, error }
-  },
-  signOut: async (): ApiResult<null> => {
-    const { error } = await supabase.auth.signOut()
-    return { data: null, error }
-  },
-  getSession: async (): ApiResult<Awaited<ReturnType<typeof supabase.auth.getSession>>['data']> => {
-    const { data, error } = await supabase.auth.getSession()
-    return { data, error }
-  },
-  updateUser: async (
-    attributes: Parameters<typeof supabase.auth.updateUser>[0]
-  ): ApiResult<UserResponse['data']> => {
-    const { data, error } = await supabase.auth.updateUser(attributes)
-    return { data, error }
-  },
+const buildQueryString = (
+  params: Record<string, string | number | boolean | null | undefined>
+): string => {
+  const search = new URLSearchParams()
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') {
+      return
+    }
+    search.append(key, String(value))
+  })
+
+  const query = search.toString()
+  return query ? `?${query}` : ''
 }
 
 const profiles = {
-  getProfile: async (id: string): ApiResult<ProfileRow | null> => {
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single()
-    return { data, error }
-  },
-  updateProfile: async (id: string, updates: ProfileUpdate): ApiResult<ProfileRow | null> => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
-    return { data, error }
-  },
+  list: async (filters: { sport_interest?: string; skill_level?: string; location?: string } = {}) =>
+    toResult<ProfileRow[]>(() => http.get(`/profiles${buildQueryString(filters)}`)),
+  getProfile: async (id: string) => toResult<ProfileRow>(() => http.get(`/profiles/${id}`)),
+  getCurrentProfile: async () => toResult<ProfileRow>(() => http.get('/profiles/me')),
+  updateCurrentProfile: async (updates: ProfileUpdate) =>
+    toResult<ProfileRow>(() => http.patch('/profiles/me', updates)),
+  createProfile: async (payload: ProfileUpdate) =>
+    toResult<ProfileRow>(() => http.post('/profiles', payload)),
 }
 
 const events = {
-  getEvents: async (filters: EventFilters = {}): ApiResult<EventRow[] | null> => {
-    let query = supabase.from('events').select('*').order('start_time', { ascending: true })
-
-    if (filters.sport) {
-      query = query.eq('sport', filters.sport)
-    }
-
-    if (filters.skill_level) {
-      query = query.eq('skill_level', filters.skill_level)
-    }
-
-    const { data, error } = await query
-    return { data, error }
-  },
-  getEvent: async (id: string): ApiResult<EventRow | null> => {
-    const { data, error } = await supabase.from('events').select('*').eq('id', id).single()
-    return { data, error }
-  },
-  createEvent: async (payload: EventInsert): ApiResult<EventRow | null> => {
-    const { data, error } = await supabase.from('events').insert(payload).select().single()
-    return { data, error }
-  },
-  updateEvent: async (id: string, updates: EventUpdate): ApiResult<EventRow | null> => {
-    const { data, error } = await supabase
-      .from('events')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
-    return { data, error }
-  },
-  deleteEvent: async (id: string): ApiResult<EventRow | null> => {
-    const { data, error } = await supabase.from('events').delete().eq('id', id).select().single()
-    return { data, error }
-  },
+  getEvents: async (filters: EventFilters = {}): ApiResult<EventRow[]> =>
+    toResult<EventRow[]>(() => {
+      const query = buildQueryString({
+        sport_type: filters.sport,
+        skill_level: filters.skill_level,
+        date_from: filters.date_from,
+        date_to: filters.date_to,
+        location: filters.location,
+      })
+      return http.get(`/events${query}`)
+    }),
+  getEvent: async (id: string): ApiResult<EventRow> => toResult(() => http.get(`/events/${id}`)),
+  createEvent: async (payload: EventInsert): ApiResult<EventRow> =>
+    toResult(() => http.post('/events', payload)),
+  updateEvent: async (id: string, updates: EventUpdate): ApiResult<EventRow> =>
+    toResult(() => http.patch(`/events/${id}`, updates)),
+  deleteEvent: async (id: string): ApiResult<null> =>
+    toResult(async () => {
+      await http.delete(`/events/${id}`)
+      return null
+    }),
 }
 
 const rsvps = {
-  getEventRsvps: async (eventId: string): ApiResult<RsvpRow[] | null> => {
-    const { data, error } = await supabase.from('rsvps').select('*').eq('event_id', eventId)
-    return { data, error }
-  },
-  getUserRsvps: async (userId: string): ApiResult<RsvpRow[] | null> => {
-    const { data, error } = await supabase.from('rsvps').select('*').eq('user_id', userId)
-    return { data, error }
-  },
-  upsertRsvp: async (payload: RsvpInsert): ApiResult<RsvpRow | null> => {
-    const { data, error } = await supabase
-      .from('rsvps')
-      .upsert(payload, { onConflict: 'event_id,user_id' })
-      .select()
-      .single()
-    return { data, error }
-  },
-  deleteRsvp: async (id: string): ApiResult<RsvpRow | null> => {
-    const { data, error } = await supabase.from('rsvps').delete().eq('id', id).select().single()
-    return { data, error }
-  },
+  getEventRsvps: async (eventId: string): ApiResult<RsvpRow[]> =>
+    toResult(() => http.get(`/rsvps/events/${eventId}/rsvps`)),
+  getUserRsvps: async (userId: string): ApiResult<RsvpRow[]> =>
+    toResult(() => http.get(`/rsvps/users/${userId}/rsvps`)),
+  upsertRsvp: async (payload: RsvpInsert): ApiResult<RsvpRow> =>
+    toResult(() => http.post(`/rsvps/events/${payload.event_id}/rsvps`, payload)),
+  deleteRsvp: async (eventId: string): ApiResult<null> =>
+    toResult(async () => {
+      await http.delete(`/rsvps/events/${eventId}/rsvps/me`)
+      return null
+    }),
 }
 
 const ratings = {
-  getHostRatings: async (hostId: string): ApiResult<RatingRow[] | null> => {
-    const { data, error } = await supabase.from('ratings').select('*').eq('to_user_id', hostId)
-    return { data, error }
-  },
-  createRating: async (payload: RatingInsert): ApiResult<RatingRow | null> => {
-    const { data, error } = await supabase.from('ratings').insert(payload).select().single()
-    return { data, error }
-  },
+  getHostRatings: async (hostId: string): ApiResult<RatingRow[]> =>
+    toResult(() => http.get(`/ratings/hosts/${hostId}/ratings`)),
+  getEventRatings: async (eventId: string): ApiResult<RatingRow[]> =>
+    toResult(() => http.get(`/ratings/events/${eventId}/ratings`)),
+  createRating: async (payload: RatingInsert): ApiResult<RatingRow> =>
+    toResult(() => http.post(`/ratings/events/${payload.event_id}/ratings`, payload)),
 }
 
 const reports = {
-  getReports: async (): ApiResult<ReportRow[] | null> => {
-    const { data, error } = await supabase.from('reports').select('*').order('created_at', { ascending: false })
-    return { data, error }
-  },
-  createReport: async (payload: ReportInsert): ApiResult<ReportRow | null> => {
-    const { data, error } = await supabase.from('reports').insert(payload).select().single()
-    return { data, error }
-  },
+  getReports: async (): ApiResult<ReportRow[]> => toResult(() => http.get('/reports')),
+  createReport: async (payload: ReportInsert): ApiResult<ReportRow> =>
+    toResult(() => {
+      if (!payload.reported_event_id) {
+        throw new Error('reported_event_id is required to submit a report')
+      }
+
+      return http.post(`/reports/events/${payload.reported_event_id}/reports`, payload)
+    }),
 }
 
 export const api = {
-  auth,
   profiles,
   events,
   rsvps,
