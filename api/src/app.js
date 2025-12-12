@@ -59,6 +59,33 @@ const authMiddleware = async (req, _res, next) => {
 
 app.use(authMiddleware);
 
+app.use((req, _res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token =
+      authHeader && typeof authHeader === 'string' && authHeader.toLowerCase().startsWith('bearer ')
+        ? authHeader.slice(7).trim()
+        : null;
+
+    if (token) {
+      req.supabase = createClient(supabaseUrl, supabaseKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-correlation-id': req.correlationId,
+          },
+        },
+      });
+    } else {
+      req.supabase = supabase;
+    }
+  } catch (_) {
+    req.supabase = supabase;
+  }
+
+  next();
+});
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

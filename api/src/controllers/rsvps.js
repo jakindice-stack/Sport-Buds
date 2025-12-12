@@ -1,7 +1,7 @@
 const getEventRsvps = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     const { data, error } = await supabase
       .from('rsvps')
@@ -22,7 +22,7 @@ const confirmRsvp = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     const { data: event, error: eventError } = await supabase
       .from('events')
@@ -61,7 +61,7 @@ const confirmRsvp = async (req, res) => {
 const getUserRsvps = async (req, res) => {
   try {
     const { userId } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     const { data, error } = await supabase
       .from('rsvps')
@@ -83,7 +83,7 @@ const createRsvp = async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const { status = 'going' } = req.body ?? {};
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     // Check if event exists and has capacity
     const { data: event, error: eventError } = await supabase
@@ -141,7 +141,7 @@ const cancelMyRsvp = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     // Delete the RSVP
     const { error } = await supabase

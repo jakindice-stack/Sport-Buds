@@ -1,7 +1,7 @@
 const getEvents = async (req, res) => {
   try {
     const { sport_type, sport, skill_level, date_from, date_to, location } = req.query;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     let query = supabase
       .from('events')
@@ -45,7 +45,7 @@ const createEvent = async (req, res) => {
       updated_at: now,
     };
     
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     const { data, error } = await supabase
       .from('events')
       .insert([eventData])
@@ -63,7 +63,7 @@ const createEvent = async (req, res) => {
 const getEventById = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     const { data, error } = await supabase
       .from('events')
@@ -90,7 +90,7 @@ const updateEvent = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     // First verify the user owns this event
     const { data: event } = await supabase
@@ -128,7 +128,7 @@ const deleteEvent = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     // First verify the user owns this event
     const { data: event } = await supabase

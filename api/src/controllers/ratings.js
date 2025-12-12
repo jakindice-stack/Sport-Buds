@@ -1,7 +1,7 @@
 const getEventRatings = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     const { data, error } = await supabase
       .from('ratings')
@@ -23,7 +23,7 @@ const submitRating = async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
     const { rating, comment = null } = req.body ?? {};
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     if (typeof rating !== 'number' || rating < 1 || rating > 5) {
       return res.status(400).json({ message: 'rating must be a number between 1 and 5' });
@@ -80,7 +80,7 @@ const submitRating = async (req, res) => {
 const getHostRatings = async (req, res) => {
   try {
     const { hostId } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     // Get all ratings for this host with event and rater info
     const { data: ratings, error: ratingsError } = await supabase

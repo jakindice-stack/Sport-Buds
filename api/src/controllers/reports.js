@@ -5,7 +5,7 @@ const submitEventReport = async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
     const { reason, comment = null, reported_user_id: reportedUserId = null } = req.body ?? {};
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
       return res.status(400).json({ message: 'reason is required to submit a report' });
@@ -64,7 +64,7 @@ const submitUserReport = async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const { reason, comment = null } = req.body ?? {};
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
       return res.status(400).json({ message: 'reason is required to submit a report' });
@@ -112,7 +112,7 @@ const listReports = async (req, res) => {
     // In a real app, you'd check if the user is an admin here
     // For now, we'll just return all reports
     
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     const { data, error } = await supabase
       .from('reports')

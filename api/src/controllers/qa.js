@@ -5,7 +5,7 @@ const listTestRecords = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     const { data, error } = await supabase
       .from(TABLE)
       .select('*')
@@ -31,7 +31,7 @@ const createTestRecord = async (req, res) => {
     }
 
     const now = new Date().toISOString();
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     const { data, error } = await supabase
       .from(TABLE)
@@ -63,7 +63,7 @@ const updateTestRecord = async (req, res) => {
     const { id } = req.params;
     const { title, payload } = req.body ?? {};
 
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     const now = new Date().toISOString();
 
     const { data, error } = await supabase
@@ -93,7 +93,7 @@ const deleteTestRecord = async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const { id } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
 
     const { error } = await supabase.from(TABLE).delete().eq('id', id).eq('user_id', userId);
 

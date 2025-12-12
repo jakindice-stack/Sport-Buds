@@ -1,7 +1,7 @@
 const getProfiles = async (req, res) => {
   try {
     const { sport_interest, skill_level, location } = req.query;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     let query = supabase.from('profiles').select('*');
     
@@ -20,7 +20,7 @@ const getProfiles = async (req, res) => {
 
 const getMyProfile = async (req, res) => {
   try {
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     const userId = req.user?.id; // Assuming you have user info in req.user from auth middleware
     
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
@@ -42,7 +42,7 @@ const getMyProfile = async (req, res) => {
 
 const updateMyProfile = async (req, res) => {
   try {
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     const userId = req.user?.id;
     const updates = req.body;
     
@@ -66,7 +66,7 @@ const updateMyProfile = async (req, res) => {
 const getProfileById = async (req, res) => {
   try {
     const { profileId } = req.params;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     const { data, error } = await supabase
       .from('profiles')
@@ -89,7 +89,7 @@ const createProfile = async (req, res) => {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
     const { email, name, ...profileData } = req.body;
-    const supabase = req.app.get('supabase');
+    const supabase = req.supabase ?? req.app.get('supabase');
     
     // First create the auth user if needed
     // This would depend on your auth setup
