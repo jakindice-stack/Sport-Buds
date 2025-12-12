@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
 
 const app = express();
 
@@ -22,11 +21,18 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 app.set('supabase', supabase);
 
 // Routes
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 app.use('/api/profiles', require('./routes/profiles'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/rsvps', require('./routes/rsvps'));
 app.use('/api/ratings', require('./routes/ratings'));
 app.use('/api/reports', require('./routes/reports'));
+
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

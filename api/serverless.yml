@@ -1,0 +1,49 @@
+service: sport-buds-api
+
+frameworkVersion: '4'
+
+plugins:
+  - serverless-offline
+
+custom:
+  secretsId: ${env:SECRETS_ID}
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-2
+  memorySize: 512
+  timeout: 30
+  environment:
+    SECRETS_ID: ${self:custom.secretsId}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://dsokgqwwi5ahz.amplifyapp.com
+        - http://localhost:5173
+      allowedMethods:
+        - '*'
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowCredentials: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - arn:aws:secretsmanager:${self:provider.region}:${aws:accountId}:secret:${self:custom.secretsId}*
+
+functions:
+  api:
+    handler: src/lambda.handler
+    events:
+      - httpApi:
+          method: ANY
+          path: /{proxy+}
+
+package:
+  patterns:
+    - sportbuds_openapi_full.yaml
