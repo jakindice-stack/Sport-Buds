@@ -10,6 +10,7 @@ const sections: FeatureSection[] = [
         <li>Students and local athletes need profiles that highlight their sports, skill levels, and availability.</li>
         <li>Profiles power smarter matching and trust when viewing hosts or attendees.</li>
         <li>Maps to PRD Feature #6 “Profile Creation”.</li>
+        <li>Hosts should see their historical ratings and event history surfaced alongside profile basics.</li>
       </ul>
     ),
   },
@@ -18,9 +19,16 @@ const sections: FeatureSection[] = [
     title: 'Form Fields',
     content: (
       <ul>
-        <li>Full name, preferred sports (multi-select), skill level, short bio, avatar upload.</li>
-        <li>Optional extras: home campus / neighborhood for future matching.</li>
-        <li>Validation: limit bio length, require at least one sport, enforce safe image formats.</li>
+        <li>
+          Required: full name, <strong>email</strong>, <strong>password (for auth)</strong>, and at least one preferred sport.
+        </li>
+        <li>
+          Optional extras: skill level, interests, photo, location / campus, host bio, event history snippet (auto-generated).
+        </li>
+        <li>
+          Validation: limit bio length, require at least one sport, enforce safe image formats, expose event history + rating if
+          user has hosted.
+        </li>
       </ul>
     ),
   },
@@ -31,13 +39,13 @@ const sections: FeatureSection[] = [
       <ul>
         <li>
           <code>{'profiles'}</code> table with columns defined in <code>{'src/types/supabase.ts'}</code> (sports as string
-          array, skill level enum).
+          array, skill level enum), plus derived views for event history + host ratings.
         </li>
         <li>
           Use <code>{'api.auth.signUp'}</code> + <code>{'api.profiles.getProfile/updateProfile'}</code> helpers for CRUD
           operations.
         </li>
-        <li>On save, refresh cached profile + show confirmation toast.</li>
+        <li>On save, refresh cached profile + show confirmation toast, and re-fetch ratings + past events.</li>
       </ul>
     ),
   },

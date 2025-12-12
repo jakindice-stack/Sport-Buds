@@ -5,6 +5,9 @@ const rsvpsController = require('../controllers/rsvps');
 // Get all RSVPs for an event
 router.get('/events/:eventId/rsvps', rsvpsController.getEventRsvps);
 
+// Get all RSVPs for a user
+router.get('/users/:userId/rsvps', rsvpsController.getUserRsvps);
+
 // RSVP to an event
 router.post('/events/:eventId/rsvps', rsvpsController.createRsvp);
 

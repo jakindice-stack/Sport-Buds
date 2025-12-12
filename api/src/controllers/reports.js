@@ -4,14 +4,18 @@ const submitEventReport = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
     
-    const { comment, user_id: reportedUserId } = req.body;
+    const { reason, comment = null, reported_user_id: reportedUserId = null } = req.body ?? {};
     const supabase = req.app.get('supabase');
+
+    if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+      return res.status(400).json({ message: 'reason is required to submit a report' });
+    }
     
     // Check if event exists
     const { data: event, error: eventError } = await supabase
       .from('events')
-      .select('event_id')
-      .eq('event_id', eventId)
+      .select('id')
+      .eq('id', eventId)
       .single();
       
     if (eventError) throw eventError;
@@ -34,17 +38,66 @@ const submitEventReport = async (req, res) => {
       .from('reports')
       .insert([{
         reporter_id: userId,
-        event_id: eventId,
-        user_id: reportedUserId || null,
+        reported_event_id: eventId,
+        reported_user_id: reportedUserId,
+        reason: reason.trim(),
         comment,
         status: 'pending',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       }])
       .select()
       .single();
       
     if (error) throw error;
     
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const submitUserReport = async (req, res) => {
+  try {
+    const { userId: reportedUserId } = req.params;
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const { reason, comment = null } = req.body ?? {};
+    const supabase = req.app.get('supabase');
+
+    if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+      return res.status(400).json({ message: 'reason is required to submit a report' });
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', reportedUserId)
+      .single();
+
+    if (profileError) throw profileError;
+    if (!profile) return res.status(404).json({ message: 'User not found' });
+
+    const { data, error } = await supabase
+      .from('reports')
+      .insert([
+        {
+          reporter_id: userId,
+          reported_user_id: reportedUserId,
+          reported_event_id: null,
+          reason: reason.trim(),
+          comment,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -81,5 +134,6 @@ const listReports = async (req, res) => {
 
 module.exports = {
   submitEventReport,
+  submitUserReport,
   listReports
 };

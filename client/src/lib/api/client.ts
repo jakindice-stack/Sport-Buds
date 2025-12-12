@@ -104,19 +104,32 @@ const ratings = {
     toResult(() => http.get(`/ratings/hosts/${hostId}/ratings`)),
   getEventRatings: async (eventId: string): ApiResult<RatingRow[]> =>
     toResult(() => http.get(`/ratings/events/${eventId}/ratings`)),
-  createRating: async (payload: RatingInsert): ApiResult<RatingRow> =>
-    toResult(() => http.post(`/ratings/events/${payload.event_id}/ratings`, payload)),
+  createRating: async (payload: Pick<RatingInsert, 'event_id' | 'rating' | 'comment'>): ApiResult<RatingRow> =>
+    toResult(() => http.post(`/ratings/events/${payload.event_id}/ratings`, { rating: payload.rating, comment: payload.comment })),
 }
 
 const reports = {
   getReports: async (): ApiResult<ReportRow[]> => toResult(() => http.get('/reports')),
-  createReport: async (payload: ReportInsert): ApiResult<ReportRow> =>
+  createReport: async (
+    payload: Pick<ReportInsert, 'reported_event_id' | 'reported_user_id' | 'reason'> & { comment?: string | null }
+  ): ApiResult<ReportRow> =>
     toResult(() => {
-      if (!payload.reported_event_id) {
-        throw new Error('reported_event_id is required to submit a report')
+      if (payload.reported_event_id) {
+        return http.post(`/reports/events/${payload.reported_event_id}/reports`, {
+          reason: payload.reason,
+          comment: payload.comment ?? null,
+          reported_user_id: payload.reported_user_id ?? null,
+        })
       }
 
-      return http.post(`/reports/events/${payload.reported_event_id}/reports`, payload)
+      if (payload.reported_user_id) {
+        return http.post(`/reports/users/${payload.reported_user_id}/reports`, {
+          reason: payload.reason,
+          comment: payload.comment ?? null,
+        })
+      }
+
+      throw new Error('Either reported_event_id or reported_user_id is required to submit a report')
     }),
 }
 

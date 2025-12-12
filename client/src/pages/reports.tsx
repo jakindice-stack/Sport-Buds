@@ -18,9 +18,18 @@ const sections: FeatureSection[] = [
     title: 'Report Flow',
     content: (
       <ol>
-        <li>User taps “Report Event” button on event popup.</li>
-        <li>Modal collects reason (dropdown + free text) and submits to Supabase.</li>
-        <li>Confirmation toast + optional follow-up instructions.</li>
+        <li>User taps “Report” from event card, map pin, or profile.</li>
+        <li>
+          Modal first asks “What are you reporting?” with explicit options (Event vs User) before showing contextual
+          fields.
+        </li>
+        <li>
+          Form collects quick dropdown reason + free-text comment box, then submits to Supabase with reporter metadata.
+        </li>
+        <li>
+          Confirmation toast + optional follow-up instructions. Too many reports on an entity auto-flags and temporarily
+          suspends it until reviewed.
+        </li>
       </ol>
     ),
   },
@@ -30,12 +39,17 @@ const sections: FeatureSection[] = [
     content: (
       <ul>
         <li>
-          Supabase <code>{'reports'}</code> table (reporter_id, reported_event_id, reason, status).
+          Supabase <code>{'reports'}</code> table (reporter_id, reported_event_id, reported_user_id, reason, comment,
+          status, auto_flag Boolean).
         </li>
         <li>
-          Client helper <code>{'api.reports.createReport(payload)'}</code> stores the entry and returns confirmation.
+          Client helper <code>{'api.reports.createReport(payload)'}</code> stores the entry and returns confirmation +
+          auto-flag hints.
         </li>
-        <li>Admin log view uses <code>{'api.reports.getReports()'}</code> ordered by newest first.</li>
+        <li>
+          Admin log view uses <code>{'api.reports.getReports()'}</code> ordered by newest first, surfaced alongside host ratings
+          and event history context.
+        </li>
       </ul>
     ),
   },
@@ -44,9 +58,9 @@ const sections: FeatureSection[] = [
     title: 'Acceptance Criteria',
     content: (
       <ul>
-        <li>Report submits once per user per event without duplicate spam.</li>
-        <li>Modal validates reason length and prevents empty submissions.</li>
-        <li>Admins see new report within seconds (Supabase real-time optional).</li>
+        <li>Report submits once per user per event without duplicate spam; UI enforces cooldown.</li>
+        <li>Modal validates reason length and prevents empty submissions; user/event radio must be selected.</li>
+        <li>Admins see new report within seconds (Supabase real-time optional) and auto-flag threshold toggles item.</li>
       </ul>
     ),
   },

@@ -8,8 +8,13 @@ const sections: FeatureSection[] = [
     content: (
       <ul>
         <li>Give hosts a control center for tracking RSVPs and capacity in real time.</li>
-        <li>Alert hosts when the attendee count meets or exceeds the configured cap.</li>
-        <li>Surface quick actions (message attendees, duplicate event) for future phases.</li>
+        <li>
+          Alert hosts when the attendee count meets or exceeds the configured cap and highlight waitlist thresholds.
+        </li>
+        <li>
+          Introduce an inbox with two tabs: “Needs Confirmation” (new RSVPs) and “Confirmed” so hosts can triage at a glance.
+        </li>
+        <li>Surface quick actions (message attendees, duplicate event, mark as full) for future phases.</li>
       </ul>
     ),
   },
@@ -34,9 +39,12 @@ const sections: FeatureSection[] = [
     title: 'UI Structure',
     content: (
       <ul>
-        <li>Hero card summarizing event details and capacity (e.g., 12/14).</li>
-        <li>List of attendees with status chips (Going / Maybe / Not Going).</li>
-        <li>Notification block when waitlist should start.</li>
+        <li>Hero card summarizing event details and capacity (e.g., 12/14) with host rating badge.</li>
+        <li>
+          Inbox component showing tabs for confirmed RSVPs vs pending confirmations, each with quick approve/decline controls.
+        </li>
+        <li>List of attendees with status chips (Going / Maybe / Not Going) and filter for “needs review”.</li>
+        <li>Notification block when waitlist should start and option to broadcast updates.</li>
       </ul>
     ),
   },

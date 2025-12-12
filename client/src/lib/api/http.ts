@@ -48,7 +48,24 @@ const parseResponse = async <T>(response: Response): Promise<T> => {
 
 const request = async <T>(path: string, config?: RequestConfig): Promise<T> => {
   const url = path.startsWith('http') ? path : `${baseUrl}${ensureLeadingSlash(path)}`
-  const response = await fetch(url, buildRequestInit(config))
+  const init = buildRequestInit(config)
+
+  try {
+    const { supabase } = await import('@/lib/supabase')
+    const { data } = await supabase.auth.getSession()
+    const token = data.session?.access_token
+
+    if (token) {
+      init.headers = {
+        ...(init.headers ?? {}),
+        Authorization: `Bearer ${token}`,
+      }
+    }
+  } catch (_) {
+    // no-op
+  }
+
+  const response = await fetch(url, init)
 
   if (!response.ok) {
     let message: string

@@ -20,6 +20,36 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 app.set('supabase', supabase);
 
+const authMiddleware = async (req, _res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
+      req.user = null;
+      return next();
+    }
+
+    const token = authHeader.slice(7).trim();
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error) {
+      req.user = null;
+      return next();
+    }
+
+    req.user = data.user ?? null;
+    return next();
+  } catch (err) {
+    req.user = null;
+    return next();
+  }
+};
+
+app.use(authMiddleware);
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
