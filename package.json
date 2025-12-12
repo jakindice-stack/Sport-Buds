@@ -4,8 +4,12 @@
   "description": "Sport Buds API - Connect with local sports enthusiasts",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "npm --prefix ./api run start",
+    "dev": "npm --prefix ./api run dev",
+    "dev:api": "npm --prefix ./api run dev",
+    "dev:client": "npm --prefix ./client run dev",
+    "deploy": "npm --prefix ./api run deploy",
+    "deploy:api": "npm --prefix ./api run deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

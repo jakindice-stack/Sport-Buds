@@ -140,7 +140,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-                "S3Key": "serverless/sport-buds-api/dev/1765507229463-2025-12-12T02:40:29.463Z/sport-buds-api.zip"
+                "S3Key": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z/sport-buds-api.zip"
               },
               "Handler": "src/lambda.handler",
               "Runtime": "nodejs20.x",
@@ -163,14 +163,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersion8PDIcBcLKwtvBVPCHqv5qMrQAK1wXfdQ5TJPxpm1aM": {
+          "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "HDKhN/pk844g8ydhvEmEaabvByxjhUGeFnzdRyX7bHQ="
+              "CodeSha256": "1YsT5k9KNmaIu5J2Yod+Ks6qjKAJc1Xu2aMqXhWlLy4="
             }
           },
           "HttpApi": {
@@ -290,7 +290,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersion8PDIcBcLKwtvBVPCHqv5qMrQAK1wXfdQ5TJPxpm1aM"
+              "Ref": "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw"
             },
             "Export": {
               "Name": "sls-sport-buds-api-dev-ApiLambdaFunctionQualifiedArn"
@@ -360,7 +360,7 @@
         "timeout": 30,
         "runtime": "nodejs20.x",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersion8PDIcBcLKwtvBVPCHqv5qMrQAK1wXfdQ5TJPxpm1aM"
+        "versionLogicalId": "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw"
       }
     },
     "configValidationMode": "warn",
@@ -387,7 +387,7 @@
         "artifactsS3KeyDirname": "serverless/sport-buds-api/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
         "artifact": "C:\\Users\\kindi\\Documents\\Sport-Buds\\api\\.serverless\\sport-buds-api.zip",
-        "artifactDirectoryName": "serverless/sport-buds-api/dev/1765507229463-2025-12-12T02:40:29.463Z"
+        "artifactDirectoryName": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z"
       }
     },
     "appId": null,
@@ -396,7 +396,7 @@
     "artifact": "C:\\Users\\kindi\\Documents\\Sport-Buds\\api\\.serverless\\sport-buds-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/sport-buds-api/dev/1765507229463-2025-12-12T02:40:29.463Z",
+    "artifactDirectoryName": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z",
     "artifact": "sport-buds-api.zip"
   }
 }
