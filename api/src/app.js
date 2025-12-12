@@ -8,6 +8,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, _res, next) => {
+  const incoming = req.headers['x-correlation-id'];
+  req.correlationId = Array.isArray(incoming) ? incoming[0] : incoming;
+  if (!req.correlationId) {
+    req.correlationId = `cid_${Math.random().toString(16).slice(2)}_${Date.now()}`;
+  }
+  next();
+});
+
 // Supabase client setup
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY; // Using ANON_KEY from .env
@@ -59,6 +68,7 @@ app.use('/api/events', require('./routes/events'));
 app.use('/api/rsvps', require('./routes/rsvps'));
 app.use('/api/ratings', require('./routes/ratings'));
 app.use('/api/reports', require('./routes/reports'));
+app.use('/api/qa', require('./routes/qa'));
 
 app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
@@ -66,8 +76,19 @@ app.get('/favicon.ico', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  const payload = {
+    level: 'error',
+    message: err?.message ?? 'Unknown error',
+    stack: err?.stack,
+    route: req?.originalUrl,
+    method: req?.method,
+    userId: req?.user?.id ?? null,
+    correlationId: req?.correlationId ?? null,
+    timestamp: new Date().toISOString(),
+  };
+
+  console.error(JSON.stringify(payload));
+  res.status(500).json({ message: 'Something went wrong!', correlationId: req?.correlationId ?? null });
 });
 
 module.exports = app;

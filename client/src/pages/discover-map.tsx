@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '@/lib/api/client'
-import { useAuth } from '@/context/AuthContext'
 
 type HostRatingsSummary = {
   average: number
@@ -27,7 +26,6 @@ const haversineKm = (a: { lat: number; lng: number }, b: { lat: number; lng: num
 }
 
 export const MapDiscoveryPage = () => {
-  const { user } = useAuth()
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [geoStatus, setGeoStatus] = useState<string | null>(null)
   const [sportFilter, setSportFilter] = useState<string>('')
@@ -36,14 +34,6 @@ export const MapDiscoveryPage = () => {
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
   const [hostRatings, setHostRatings] = useState<Record<string, HostRatingsSummary>>({})
-
-  const [rateModal, setRateModal] = useState<{ open: boolean; eventId: string; hostId: string } | null>(null)
-  const [reportModal, setReportModal] = useState<{ open: boolean; eventId: string; hostId: string } | null>(null)
-  const [reportTarget, setReportTarget] = useState<'event' | 'user'>('event')
-  const [reportReason, setReportReason] = useState('')
-  const [reportComment, setReportComment] = useState('')
-  const [ratingValue, setRatingValue] = useState<number>(5)
-  const [ratingComment, setRatingComment] = useState('')
 
   useEffect(() => {
     setGeoStatus(null)
@@ -140,90 +130,6 @@ export const MapDiscoveryPage = () => {
     })
   }, [events, userLocation])
 
-  const hostIdFor = (evt: any) => String(evt.host_id ?? evt.host?.id ?? '')
-
-  const onRsvp = async (eventId: string) => {
-    setStatus(null)
-    if (!user) {
-      setStatus({ type: 'error', message: 'Please log in before RSVPing.' })
-      return
-    }
-
-    const { error } = await api.rsvps.upsertRsvp({ event_id: eventId, user_id: user.id, status: 'going' })
-    if (error) {
-      setStatus({ type: 'error', message: error.message })
-      return
-    }
-    setStatus({ type: 'success', message: 'RSVP saved.' })
-  }
-
-  const openRate = (evt: any) => {
-    const hostId = hostIdFor(evt)
-    if (!hostId) {
-      setStatus({ type: 'error', message: 'Host information unavailable for this event.' })
-      return
-    }
-    setRatingValue(5)
-    setRatingComment('')
-    setRateModal({ open: true, eventId: String(evt.id), hostId })
-  }
-
-  const openReport = (evt: any) => {
-    const hostId = hostIdFor(evt)
-    setReportTarget('event')
-    setReportReason('')
-    setReportComment('')
-    setReportModal({ open: true, eventId: String(evt.id), hostId })
-  }
-
-  const submitRating = async () => {
-    if (!rateModal) return
-    setStatus(null)
-    const { error } = await api.ratings.createRating({
-      event_id: rateModal.eventId,
-      rating: ratingValue,
-      comment: ratingComment || null,
-    })
-    if (error) {
-      setStatus({ type: 'error', message: error.message })
-      return
-    }
-    setStatus({ type: 'success', message: 'Rating submitted.' })
-    setRateModal(null)
-  }
-
-  const submitReport = async () => {
-    if (!reportModal) return
-    setStatus(null)
-    if (!reportReason.trim()) {
-      setStatus({ type: 'error', message: 'Please provide a reason.' })
-      return
-    }
-
-    const payload =
-      reportTarget === 'event'
-        ? {
-            reported_event_id: reportModal.eventId,
-            reported_user_id: null,
-            reason: reportReason.trim(),
-            comment: reportComment || null,
-          }
-        : {
-            reported_event_id: null,
-            reported_user_id: reportModal.hostId,
-            reason: reportReason.trim(),
-            comment: reportComment || null,
-          }
-
-    const { error } = await api.reports.createReport(payload as any)
-    if (error) {
-      setStatus({ type: 'error', message: error.message })
-      return
-    }
-    setStatus({ type: 'success', message: 'Report submitted.' })
-    setReportModal(null)
-  }
-
   return (
     <section className="space-y-8">
       <header className="space-y-3">
@@ -255,7 +161,7 @@ export const MapDiscoveryPage = () => {
 
         <div className="flex items-center gap-3">
           <Link
-            to="/events/create"
+            to="/app/create-event"
             className="chip border-slate-900 bg-slate-900 text-white hover:opacity-90"
           >
             Create event
@@ -276,7 +182,7 @@ export const MapDiscoveryPage = () => {
           ) : (
             sortedEvents.map((evt) => {
               const isSelected = String(evt.id) === String(selectedEventId)
-              const hostId = hostIdFor(evt)
+              const hostId = String(evt.host_id ?? evt.host?.id ?? '')
               const hostRating = hostId ? hostRatings[hostId] : undefined
 
               return (
@@ -333,141 +239,17 @@ export const MapDiscoveryPage = () => {
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
                   <Link
-                    to={`/events/${selectedEvent.id}`}
+                    to={`/app/events/${selectedEvent.id}`}
                     className="chip border-slate-900 bg-slate-900 text-white hover:opacity-90"
                   >
                     Event details
                   </Link>
-                  <button type="button" className="chip bg-white" onClick={() => onRsvp(String(selectedEvent.id))}>
-                    RSVP
-                  </button>
-                  <button type="button" className="chip bg-white" onClick={() => openRate(selectedEvent)}>
-                    Rate host
-                  </button>
-                  <button type="button" className="chip bg-white" onClick={() => openReport(selectedEvent)}>
-                    Report
-                  </button>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
-
-      {rateModal?.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="font-display text-xl font-semibold text-[var(--sb-text)]">Rate host</h3>
-                <p className="text-sm text-[var(--sb-muted)]">5-star scale. Only attendees can submit.</p>
-              </div>
-              <button type="button" className="chip bg-white" onClick={() => setRateModal(null)}>
-                Close
-              </button>
-            </div>
-
-            <div className="mt-5 space-y-4">
-              <label className="flex flex-col gap-2 text-sm font-medium text-[var(--sb-text)]">
-                Rating
-                <select
-                  value={ratingValue}
-                  onChange={(e) => setRatingValue(Number(e.target.value))}
-                  className="rounded-2xl border border-[var(--sb-border)] bg-white px-4 py-3 text-base"
-                >
-                  {[5, 4, 3, 2, 1].map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="flex flex-col gap-2 text-sm font-medium text-[var(--sb-text)]">
-                Optional comment
-                <textarea
-                  rows={3}
-                  value={ratingComment}
-                  onChange={(e) => setRatingComment(e.target.value)}
-                  className="rounded-2xl border border-[var(--sb-border)] bg-white px-4 py-3 text-base"
-                />
-              </label>
-
-              <button
-                type="button"
-                className="rounded-2xl bg-[var(--sb-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-                onClick={submitRating}
-              >
-                Submit rating
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {reportModal?.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="font-display text-xl font-semibold text-[var(--sb-text)]">Submit a report</h3>
-                <p className="text-sm text-[var(--sb-muted)]">Choose what you're reporting, then add details.</p>
-              </div>
-              <button type="button" className="chip bg-white" onClick={() => setReportModal(null)}>
-                Close
-              </button>
-            </div>
-
-            <div className="mt-5 space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  className={`chip ${reportTarget === 'event' ? 'border-slate-900 bg-slate-900 text-white' : 'bg-white'}`}
-                  onClick={() => setReportTarget('event')}
-                >
-                  Report event
-                </button>
-                <button
-                  type="button"
-                  className={`chip ${reportTarget === 'user' ? 'border-slate-900 bg-slate-900 text-white' : 'bg-white'}`}
-                  onClick={() => setReportTarget('user')}
-                >
-                  Report host
-                </button>
-              </div>
-
-              <label className="flex flex-col gap-2 text-sm font-medium text-[var(--sb-text)]">
-                Reason (required)
-                <input
-                  type="text"
-                  value={reportReason}
-                  onChange={(e) => setReportReason(e.target.value)}
-                  className="rounded-2xl border border-[var(--sb-border)] bg-white px-4 py-3 text-base"
-                  placeholder="Unsafe behavior / inappropriate content"
-                />
-              </label>
-
-              <label className="flex flex-col gap-2 text-sm font-medium text-[var(--sb-text)]">
-                Comment box
-                <textarea
-                  rows={3}
-                  value={reportComment}
-                  onChange={(e) => setReportComment(e.target.value)}
-                  className="rounded-2xl border border-[var(--sb-border)] bg-white px-4 py-3 text-base"
-                />
-              </label>
-
-              <button
-                type="button"
-                className="rounded-2xl bg-[var(--sb-accent)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-                onClick={submitReport}
-              >
-                Submit report
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   )
 }

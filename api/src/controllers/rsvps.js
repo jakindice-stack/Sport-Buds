@@ -16,6 +16,48 @@ const getEventRsvps = async (req, res) => {
   }
 };
 
+const confirmRsvp = async (req, res) => {
+  try {
+    const { eventId, rsvpId } = req.params;
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const supabase = req.app.get('supabase');
+
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select('host_id')
+      .eq('id', eventId)
+      .single();
+
+    if (eventError) throw eventError;
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+    if (String(event.host_id) !== String(userId)) {
+      return res.status(403).json({ message: 'Not authorized to manage RSVPs for this event' });
+    }
+
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from('rsvps')
+      .update({
+        host_confirmed: true,
+        confirmed_at: now,
+        updated_at: now,
+      })
+      .eq('id', rsvpId)
+      .eq('event_id', eventId)
+      .select('*, user:profiles(*), event:events(*)')
+      .single();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ message: 'RSVP not found' });
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getUserRsvps = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -76,6 +118,8 @@ const createRsvp = async (req, res) => {
           event_id: eventId,
           user_id: userId,
           status,
+          host_confirmed: false,
+          confirmed_at: null,
           updated_at: now,
         },
         { onConflict: 'event_id,user_id' }
@@ -118,5 +162,6 @@ module.exports = {
   getEventRsvps,
   getUserRsvps,
   createRsvp,
+  confirmRsvp,
   cancelMyRsvp
 };

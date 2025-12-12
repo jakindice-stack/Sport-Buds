@@ -1,39 +1,48 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
-import { Layout } from '@/components/layout'
-import { Home } from '@/pages/home'
+import { AppShell } from '@/components/app-shell'
+import { ProtectedRoute } from '@/components/protected-route'
+import { IndexRedirect } from '@/pages/index-redirect'
 import { AuthPage } from '@/pages/auth'
 import { NotFound } from '@/pages/not-found'
-import { CreateEventPage } from '@/pages/events-create'
-import { FilterBySportPage } from '@/pages/events-filter'
-import { MapDiscoveryPage } from '@/pages/discover-map'
+import { AppDashboardPage } from '@/pages/app-dashboard'
+import { AppMapPage } from '@/pages/app-map'
+import { AppFindEventsPage } from '@/pages/app-find-events'
+import { AppSearchFiltersPage } from '@/pages/app-search'
+import { AppProfilePage } from '@/pages/app-profile'
+import { AppNotificationsPage } from '@/pages/app-notifications'
+import { AppReportsPage } from '@/pages/app-reports'
+import { AppRsvpManagementPage } from '@/pages/app-rsvp-management'
+import { AppDeploymentReadinessPage } from '@/pages/app-deployment-readiness'
+import { AppCreateEventPage } from '@/pages/app-create-event'
 import { EventDetailsPage } from '@/pages/events-detail'
-import { RsvpPage } from '@/pages/events-rsvp'
-import { HostDashboardPage } from '@/pages/host-dashboard'
-import { ProfileManagePage } from '@/pages/profile-manage'
-import { ReportsPage } from '@/pages/reports'
-import { HostRatingsPage } from '@/pages/ratings'
 import './App.css'
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/events/create" element={<CreateEventPage />} />
-          <Route path="/events/:eventId" element={<EventDetailsPage />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/events/filter" element={<FilterBySportPage />} />
-          <Route path="/discover/map" element={<MapDiscoveryPage />} />
-          <Route path="/events/rsvp" element={<RsvpPage />} />
-          <Route path="/host/dashboard" element={<HostDashboardPage />} />
-          <Route path="/profile/manage" element={<ProfileManagePage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/ratings" element={<HostRatingsPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/" element={<IndexRedirect />} />
+        <Route path="/auth" element={<AuthPage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppShell />}>
+            <Route path="/app/dashboard" element={<AppDashboardPage />} />
+            <Route path="/app/map" element={<AppMapPage />} />
+            <Route path="/app/find-events" element={<AppFindEventsPage />} />
+            <Route path="/app/search" element={<AppSearchFiltersPage />} />
+            <Route path="/app/profile" element={<AppProfilePage />} />
+            <Route path="/app/notifications" element={<AppNotificationsPage />} />
+            <Route path="/app/reports" element={<AppReportsPage />} />
+            <Route path="/app/rsvp-management" element={<AppRsvpManagementPage />} />
+            <Route path="/app/deployment-readiness" element={<AppDeploymentReadinessPage />} />
+            <Route path="/app/create-event" element={<AppCreateEventPage />} />
+            <Route path="/app/events/:eventId" element={<EventDetailsPage />} />
+          </Route>
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Toaster />
     </Router>
   )

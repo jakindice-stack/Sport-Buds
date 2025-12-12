@@ -167,7 +167,7 @@ export const EventDetailsPage = () => {
       </header>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Link to="/discover/map" className="chip bg-white/70 hover:border-slate-400 hover:text-slate-900">
+        <Link to="/app/map" className="chip bg-white/70 hover:border-slate-400 hover:text-slate-900">
           Back to discovery
         </Link>
         <button type="button" className="chip bg-white" onClick={onRsvp}>
@@ -246,14 +246,6 @@ export const EventDetailsPage = () => {
                     : 'Unreviewed'
                   : 'Loading…'}
               </span>
-              {hostId && (
-                <Link
-                  to={`/ratings`}
-                  className="chip bg-white/70 hover:border-slate-400 hover:text-slate-900"
-                >
-                  View ratings
-                </Link>
-              )}
             </div>
 
             <div className="mt-6 rounded-2xl border border-[var(--sb-border)] bg-white/60 p-4">

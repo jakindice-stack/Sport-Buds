@@ -17,12 +17,35 @@ type RatingInsert = Tables['ratings']['Insert']
 export type ReportRow = Tables['reports']['Row']
 type ReportInsert = Tables['reports']['Insert']
 
+export type QaTestRecordRow = {
+  id: string
+  user_id: string
+  title: string
+  payload: unknown | null
+  created_at: string
+  updated_at: string
+}
+
 type EventFilters = {
   sport?: string
   skill_level?: EventRow['skill_level']
   date_from?: string
   date_to?: string
   location?: string
+}
+
+const qa = {
+  listTestRecords: async (): ApiResult<QaTestRecordRow[]> =>
+    toResult(() => http.get('/qa/test-records')),
+  createTestRecord: async (payload: { title: string; payload?: unknown }): ApiResult<QaTestRecordRow> =>
+    toResult(() => http.post('/qa/test-records', payload)),
+  updateTestRecord: async (id: string, updates: { title?: string; payload?: unknown }): ApiResult<QaTestRecordRow> =>
+    toResult(() => http.patch(`/qa/test-records/${id}`, updates)),
+  deleteTestRecord: async (id: string): ApiResult<null> =>
+    toResult(async () => {
+      await http.delete(`/qa/test-records/${id}`)
+      return null
+    }),
 }
 
 const toResult = async <T>(executor: () => Promise<T>): ApiResult<T> => {
@@ -92,6 +115,8 @@ const rsvps = {
     toResult(() => http.get(`/rsvps/users/${userId}/rsvps`)),
   upsertRsvp: async (payload: RsvpInsert): ApiResult<RsvpRow> =>
     toResult(() => http.post(`/rsvps/events/${payload.event_id}/rsvps`, payload)),
+  confirmRsvp: async (eventId: string, rsvpId: string): ApiResult<RsvpRow> =>
+    toResult(() => http.post(`/rsvps/events/${eventId}/rsvps/${rsvpId}/confirm`)),
   deleteRsvp: async (eventId: string): ApiResult<null> =>
     toResult(async () => {
       await http.delete(`/rsvps/events/${eventId}/rsvps/me`)
@@ -139,4 +164,5 @@ export const api = {
   rsvps,
   ratings,
   reports,
+  qa,
 }

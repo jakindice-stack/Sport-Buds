@@ -13,6 +13,34 @@ type RequestConfig = Omit<RequestInit, 'body'> & {
   body?: unknown
 }
 
+export type CorrelatedError = Error & { correlationId?: string; status?: number }
+
+const AUTH_OVERRIDE_KEY = 'sb_auth_token_override'
+
+export const setAuthTokenOverride = (token: string) => {
+  try {
+    localStorage.setItem(AUTH_OVERRIDE_KEY, token)
+  } catch (_) {
+    // no-op
+  }
+}
+
+export const clearAuthTokenOverride = () => {
+  try {
+    localStorage.removeItem(AUTH_OVERRIDE_KEY)
+  } catch (_) {
+    // no-op
+  }
+}
+
+const getAuthTokenOverride = (): string | null => {
+  try {
+    return localStorage.getItem(AUTH_OVERRIDE_KEY)
+  } catch (_) {
+    return null
+  }
+}
+
 const buildRequestInit = ({ body, headers, ...config }: RequestConfig = {}): RequestInit => {
   const init: RequestInit = {
     ...config,
@@ -50,10 +78,19 @@ const request = async <T>(path: string, config?: RequestConfig): Promise<T> => {
   const url = path.startsWith('http') ? path : `${baseUrl}${ensureLeadingSlash(path)}`
   const init = buildRequestInit(config)
 
+  const correlationId =
+    (globalThis.crypto && 'randomUUID' in globalThis.crypto && globalThis.crypto.randomUUID()) ||
+    `cid_${Math.random().toString(16).slice(2)}_${Date.now()}`
+
+  init.headers = {
+    ...(init.headers ?? {}),
+    'x-correlation-id': correlationId,
+  }
+
   try {
     const { supabase } = await import('@/lib/supabase')
     const { data } = await supabase.auth.getSession()
-    const token = data.session?.access_token
+    const token = getAuthTokenOverride() ?? data.session?.access_token
 
     if (token) {
       init.headers = {
@@ -76,7 +113,10 @@ const request = async <T>(path: string, config?: RequestConfig): Promise<T> => {
       message = await response.text()
     }
 
-    throw new Error(message || `Request to ${url} failed with status ${response.status}`)
+    const err = new Error(message || `Request to ${url} failed with status ${response.status}`) as CorrelatedError
+    err.correlationId = correlationId
+    err.status = response.status
+    throw err
   }
 
   return parseResponse<T>(response)
