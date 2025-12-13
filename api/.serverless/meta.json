@@ -25,6 +25,7 @@
           "cors": {
             "allowedOrigins": [
               "https://dsokgqwwi5ahz.amplifyapp.com",
+              "https://main.dsokgqwwi5ahz.amplifyapp.com",
               "http://localhost:5173"
             ],
             "allowedMethods": [
@@ -32,7 +33,8 @@
             ],
             "allowedHeaders": [
               "Content-Type",
-              "Authorization"
+              "Authorization",
+              "x-correlation-id"
             ],
             "allowCredentials": "<REDACTED>"
           }
@@ -152,7 +154,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-                  "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
+                  "S3Key": "serverless/sport-buds-api/dev/1765614035093-2025-12-13T08:20:35.093Z/sport-buds-api.zip"
                 },
                 "Handler": "src/lambda.handler",
                 "Runtime": "nodejs20.x",
@@ -175,14 +177,14 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw": {
+            "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "1YsT5k9KNmaIu5J2Yod+Ks6qjKAJc1Xu2aMqXhWlLy4="
+                "CodeSha256": "vVefm/FMEHKHiuEu+gSZuc4vMvPUyw6coaacoQ2Ax9g="
               }
             },
             "HttpApi": {
@@ -194,13 +196,15 @@
                   "AllowCredentials": "<REDACTED>",
                   "AllowHeaders": [
                     "Content-Type",
-                    "Authorization"
+                    "Authorization",
+                    "x-correlation-id"
                   ],
                   "AllowMethods": [
                     "*"
                   ],
                   "AllowOrigins": [
                     "https://dsokgqwwi5ahz.amplifyapp.com",
+                    "https://main.dsokgqwwi5ahz.amplifyapp.com",
                     "http://localhost:5173"
                   ]
                 }
@@ -305,7 +309,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw"
+                "Ref": "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI"
               },
               "Export": {
                 "Name": "sls-sport-buds-api-dev-ApiLambdaFunctionQualifiedArn"
@@ -368,7 +372,7 @@
           "timeout": 30,
           "runtime": "nodejs20.x",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw"
+          "versionLogicalId": "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI"
         }
       },
       "package": {
@@ -378,7 +382,7 @@
         "artifactsS3KeyDirname": "serverless/sport-buds-api/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
         "artifact": "C:\\Users\\kindi\\Documents\\Sport-Buds\\api\\.serverless\\sport-buds-api.zip",
-        "artifactDirectoryName": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z"
+        "artifactDirectoryName": "serverless/sport-buds-api/dev/1765614035093-2025-12-13T08:20:35.093Z"
       }
     },
     "provider": {
@@ -394,6 +398,7 @@
         "cors": {
           "allowedOrigins": [
             "https://dsokgqwwi5ahz.amplifyapp.com",
+            "https://main.dsokgqwwi5ahz.amplifyapp.com",
             "http://localhost:5173"
           ],
           "allowedMethods": [
@@ -401,7 +406,8 @@
           ],
           "allowedHeaders": [
             "Content-Type",
-            "Authorization"
+            "Authorization",
+            "x-correlation-id"
           ],
           "allowCredentials": "<REDACTED>"
         }
@@ -521,7 +527,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-                "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
+                "S3Key": "serverless/sport-buds-api/dev/1765614035093-2025-12-13T08:20:35.093Z/sport-buds-api.zip"
               },
               "Handler": "src/lambda.handler",
               "Runtime": "nodejs20.x",
@@ -544,14 +550,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw": {
+          "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "1YsT5k9KNmaIu5J2Yod+Ks6qjKAJc1Xu2aMqXhWlLy4="
+              "CodeSha256": "vVefm/FMEHKHiuEu+gSZuc4vMvPUyw6coaacoQ2Ax9g="
             }
           },
           "HttpApi": {
@@ -563,13 +569,15 @@
                 "AllowCredentials": "<REDACTED>",
                 "AllowHeaders": [
                   "Content-Type",
-                  "Authorization"
+                  "Authorization",
+                  "x-correlation-id"
                 ],
                 "AllowMethods": [
                   "*"
                 ],
                 "AllowOrigins": [
                   "https://dsokgqwwi5ahz.amplifyapp.com",
+                  "https://main.dsokgqwwi5ahz.amplifyapp.com",
                   "http://localhost:5173"
                 ]
               }
@@ -674,7 +682,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw"
+              "Ref": "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI"
             },
             "Export": {
               "Name": "sls-sport-buds-api-dev-ApiLambdaFunctionQualifiedArn"
@@ -727,7 +735,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: sport-buds-api\r\n\r\nframeworkVersion: '4'\r\n\r\nplugins:\r\n  - serverless-offline\r\n\r\ncustom:\r\n  secretsId: ${env:SECRETS_ID}\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs20.x\r\n  region: us-east-2\r\n  memorySize: 512\r\n  timeout: 30\r\n  environment:\r\n    SECRETS_ID: ${self:custom.secretsId}\r\n  httpApi:\r\n    cors:\r\n      allowedOrigins:\r\n        - https://dsokgqwwi5ahz.amplifyapp.com\r\n        - http://localhost:5173\r\n      allowedMethods:\r\n        - '*'\r\n      allowedHeaders:\r\n        - Content-Type\r\n        - Authorization\r\n      allowCredentials: true\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - secretsmanager:GetSecretValue\r\n          Resource:\r\n            - arn:aws:secretsmanager:${self:provider.region}:${aws:accountId}:secret:${self:custom.secretsId}*\r\n\r\nfunctions:\r\n  api:\r\n    handler: src/lambda.handler\r\n    events:\r\n      - httpApi:\r\n          method: ANY\r\n          path: /{proxy+}\r\n\r\npackage:\r\n  patterns:\r\n    - sportbuds_openapi_full.yaml\r\n",
+    "serviceRawFile": "service: sport-buds-api\r\n\r\nframeworkVersion: '4'\r\n\r\nplugins:\r\n  - serverless-offline\r\n\r\ncustom:\r\n  secretsId: ${env:SECRETS_ID}\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs20.x\r\n  region: us-east-2\r\n  memorySize: 512\r\n  timeout: 30\r\n  environment:\r\n    SECRETS_ID: ${self:custom.secretsId}\r\n  httpApi:\r\n    cors:\r\n      allowedOrigins:\r\n        - https://dsokgqwwi5ahz.amplifyapp.com\r\n        - https://main.dsokgqwwi5ahz.amplifyapp.com\r\n        - http://localhost:5173\r\n      allowedMethods:\r\n        - '*'\r\n      allowedHeaders:\r\n        - Content-Type\r\n        - Authorization\r\n        - x-correlation-id\r\n      allowCredentials: true\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - secretsmanager:GetSecretValue\r\n          Resource:\r\n            - arn:aws:secretsmanager:${self:provider.region}:${aws:accountId}:secret:${self:custom.secretsId}*\r\n\r\nfunctions:\r\n  api:\r\n    handler: src/lambda.handler\r\n    events:\r\n      - httpApi:\r\n          method: ANY\r\n          path: /{proxy+}\r\n\r\npackage:\r\n  patterns:\r\n    - sportbuds_openapi_full.yaml\r\n",
     "command": [
       "deploy"
     ],
@@ -867,7 +875,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-              "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
+              "S3Key": "serverless/sport-buds-api/dev/1765614035093-2025-12-13T08:20:35.093Z/sport-buds-api.zip"
             },
             "Handler": "src/lambda.handler",
             "Runtime": "nodejs20.x",
@@ -890,14 +898,14 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw": {
+        "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "1YsT5k9KNmaIu5J2Yod+Ks6qjKAJc1Xu2aMqXhWlLy4="
+            "CodeSha256": "vVefm/FMEHKHiuEu+gSZuc4vMvPUyw6coaacoQ2Ax9g="
           }
         },
         "HttpApi": {
@@ -909,13 +917,15 @@
               "AllowCredentials": "<REDACTED>",
               "AllowHeaders": [
                 "Content-Type",
-                "Authorization"
+                "Authorization",
+                "x-correlation-id"
               ],
               "AllowMethods": [
                 "*"
               ],
               "AllowOrigins": [
                 "https://dsokgqwwi5ahz.amplifyapp.com",
+                "https://main.dsokgqwwi5ahz.amplifyapp.com",
                 "http://localhost:5173"
               ]
             }
@@ -1020,7 +1030,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersionJ2aRDcmU8Cea8CjkhEYKUXAUs7zzXkES0RMgI850SHw"
+            "Ref": "ApiLambdaVersionf8LoDZ75Iv90aLAAvY3vMJZLAVlEAcp2KnPuypQcvI"
           },
           "Export": {
             "Name": "sls-sport-buds-api-dev-ApiLambdaFunctionQualifiedArn"
