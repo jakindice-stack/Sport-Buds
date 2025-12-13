@@ -20,12 +20,14 @@ provider:
     cors:
       allowedOrigins:
         - https://dsokgqwwi5ahz.amplifyapp.com
+        - https://main.dsokgqwwi5ahz.amplifyapp.com
         - http://localhost:5173
       allowedMethods:
         - '*'
       allowedHeaders:
         - Content-Type
         - Authorization
+        - x-correlation-id
       allowCredentials: true
   iam:
     role:

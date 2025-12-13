@@ -1,11 +1,8 @@
 const API_BASE = import.meta.env.VITE_API_BASE
 
-if (!API_BASE) {
-  throw new Error('Missing VITE_API_BASE environment variable')
-}
-
 const normalizeBase = (base: string) => base.replace(/\/$/, '')
-const baseUrl = normalizeBase(API_BASE)
+export const apiBaseConfigError = !API_BASE ? 'Missing VITE_API_BASE environment variable' : null
+const baseUrl = API_BASE ? normalizeBase(API_BASE) : ''
 
 const ensureLeadingSlash = (path: string) => (path.startsWith('/') ? path : `/${path}`)
 
@@ -75,6 +72,9 @@ const parseResponse = async <T>(response: Response): Promise<T> => {
 }
 
 const request = async <T>(path: string, config?: RequestConfig): Promise<T> => {
+  if (!API_BASE) {
+    throw new Error('Missing VITE_API_BASE environment variable')
+  }
   const url = path.startsWith('http') ? path : `${baseUrl}${ensureLeadingSlash(path)}`
   const init = buildRequestInit(config)
 
@@ -89,6 +89,9 @@ const request = async <T>(path: string, config?: RequestConfig): Promise<T> => {
 
   try {
     const { supabase } = await import('@/lib/supabase')
+    if (!supabase) {
+      throw new Error('Missing Supabase environment variables')
+    }
     const { data } = await supabase.auth.getSession()
     const token = getAuthTokenOverride() ?? data.session?.access_token
 

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js'
 import type { User } from '@/types'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseConfigError } from '@/lib/supabase'
 
 type AuthContextType = {
   user: User | null;
@@ -33,10 +33,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [configError, setConfigError] = useState<string | null>(supabaseConfigError)
 
   useEffect(() => {
+    const sb = supabase
+    if (!sb) {
+      setConfigError(supabaseConfigError)
+      setLoading(false)
+      return
+    }
+
     const fetchSession = async () => {
-      const { data } = await supabase.auth.getSession()
+      const { data } = await sb.auth.getSession()
       setSession(data.session)
       setUser(mapUser(data.session?.user ?? null))
       setLoading(false)
@@ -46,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = sb.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
       setUser(mapUser(nextSession?.user ?? null))
       setLoading(false)
@@ -59,8 +67,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { error: new Error(supabaseConfigError ?? 'Missing Supabase environment variables') }
+    }
+
+    const sb = supabase!
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      const { data, error } = await sb.auth.signInWithPassword({ email, password })
       if (!error) {
         setSession(data.session)
         setUser(mapUser(data.user ?? null))
@@ -73,8 +86,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Sign up with email and password
   const signUp = async (email: string, password: string, fullName: string) => {
+    if (!supabase) {
+      return { error: new Error(supabaseConfigError ?? 'Missing Supabase environment variables') }
+    }
+
+    const sb = supabase!
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await sb.auth.signUp({
         email,
         password,
         options: {
@@ -88,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Create a profile for the new user
       if (data.user) {
-        await supabase.from('profiles').upsert({
+        await sb.from('profiles').upsert({
           id: data.user.id,
           full_name: fullName,
           updated_at: new Date().toISOString(),
@@ -106,8 +124,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Sign out
   const signOut = async () => {
+    if (!supabase) {
+      return { error: new Error(supabaseConfigError ?? 'Missing Supabase environment variables') }
+    }
+
+    const sb = supabase!
     try {
-      const { error } = await supabase.auth.signOut()
+      const { error } = await sb.auth.signOut()
       if (!error) {
         setUser(null)
         setSession(null)
@@ -120,12 +143,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Update user profile
   const updateProfile = async (updates: Partial<User>) => {
+    if (!supabase) {
+      return { error: new Error(supabaseConfigError ?? 'Missing Supabase environment variables') }
+    }
+
+    const sb = supabase!
     try {
       if (!user) {
         throw new Error('No authenticated user')
       }
 
-      const { error } = await supabase
+      const { error } = await sb
         .from('profiles')
         .update(updates)
         .eq('id', user.id)
@@ -151,7 +179,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     updateProfile,
   };
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>
+  if (loading) {
+    return <AuthContext.Provider value={value} />
+  }
+
+  if (configError) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center p-6">
+        <div className="w-full max-w-xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h1 className="text-lg font-semibold">App configuration error</h1>
+          <p className="mt-2 text-sm text-slate-700">{configError}</p>
+          <div className="mt-4 rounded-lg bg-slate-50 p-3 text-sm font-mono text-slate-700">
+            VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+          </div>
+          <p className="mt-4 text-sm text-slate-700">
+            Set these in your hosting provider (Amplify) Environment Variables and redeploy.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = (): AuthContextType => {

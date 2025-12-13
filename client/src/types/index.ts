@@ -20,7 +20,7 @@ export interface Profile {
 export interface Event {
   id: string;
   title: string;
-  description: string;
+  details: string;
   sport: string;
   start_time: string;
   end_time: string;
@@ -83,7 +83,7 @@ export interface ApiResponse<T> {
 // Form Data Types
 export interface EventFormData {
   title: string;
-  description: string;
+  details: string;
   sport: string;
   start_time: string;
   end_time: string;

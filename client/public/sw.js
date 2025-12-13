@@ -14,21 +14,25 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  const request = event.request
-
-  if (request.method !== 'GET') return
+  const url = new URL(event.request.url)
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return
+  }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
+    caches.match(event.request).then((cached) => {
       if (cached) return cached
-      return fetch(request)
+      return fetch(event.request)
         .then((response) => {
-          if (!response || response.status !== 200) return response
           const cloned = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned))
+          caches.open(CACHE_NAME).then((cache) => {
+            if (response && response.ok) {
+              cache.put(event.request, cloned)
+            }
+          })
           return response
         })
-        .catch(() => cached)
+        .catch(() => cached || new Response('Offline', { status: 503 }))
     })
   )
 })

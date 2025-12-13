@@ -44,7 +44,7 @@ export const AppFindEventsPage = () => {
 
   const filteredEvents = useMemo(() => {
     if (!filters.eventType) return events
-    return events.filter((evt) => String(evt.description ?? '').toLowerCase().includes(filters.eventType.toLowerCase()))
+    return events.filter((evt) => String(evt.details ?? '').toLowerCase().includes(filters.eventType.toLowerCase()))
   }, [events, filters.eventType])
 
   return (
@@ -115,7 +115,7 @@ export const AppFindEventsPage = () => {
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-[var(--sb-text)]">{evt.sport}</p>
                   <h3 className="font-display text-xl font-semibold text-[var(--sb-text)]">{evt.title}</h3>
-                  <p className="text-sm text-[var(--sb-muted)]">{evt.description}</p>
+                  <p className="text-sm text-[var(--sb-muted)]">{evt.details}</p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span className="chip bg-white/70 text-xs">{evt.skill_level}</span>

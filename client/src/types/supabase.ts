@@ -46,7 +46,7 @@ export interface Database {
         Row: {
           id: string
           title: string
-          description: string
+          details: string
           sport: string
           start_time: string
           end_time: string
@@ -62,7 +62,7 @@ export interface Database {
         Insert: {
           id?: string
           title: string
-          description: string
+          details: string
           sport: string
           start_time: string
           end_time: string
@@ -78,7 +78,7 @@ export interface Database {
         Update: {
           id?: string
           title?: string
-          description?: string
+          details?: string
           sport?: string
           start_time?: string
           end_time?: string

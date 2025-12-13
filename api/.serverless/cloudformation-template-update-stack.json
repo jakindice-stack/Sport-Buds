@@ -98,7 +98,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-          "S3Key": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z/sport-buds-api.zip"
+          "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
         },
         "Handler": "src/lambda.handler",
         "Runtime": "nodejs20.x",

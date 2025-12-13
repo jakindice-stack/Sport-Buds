@@ -152,7 +152,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-                  "S3Key": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z/sport-buds-api.zip"
+                  "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
                 },
                 "Handler": "src/lambda.handler",
                 "Runtime": "nodejs20.x",
@@ -378,7 +378,7 @@
         "artifactsS3KeyDirname": "serverless/sport-buds-api/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
         "artifact": "C:\\Users\\kindi\\Documents\\Sport-Buds\\api\\.serverless\\sport-buds-api.zip",
-        "artifactDirectoryName": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z"
+        "artifactDirectoryName": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z"
       }
     },
     "provider": {
@@ -521,7 +521,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-                "S3Key": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z/sport-buds-api.zip"
+                "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
               },
               "Handler": "src/lambda.handler",
               "Runtime": "nodejs20.x",
@@ -740,12 +740,12 @@
     "serviceProviderAwsCfStackName": "sport-buds-api-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-2:160960898567:stack/sport-buds-api-dev/9feefe90-d6ff-11f0-950f-065e56f2d829",
     "serviceProviderAwsCfStackCreated": "2025-12-12T02:09:43.817Z",
-    "serviceProviderAwsCfStackUpdated": "2025-12-12T02:40:37.339Z",
+    "serviceProviderAwsCfStackUpdated": "2025-12-12T09:31:34.979Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-2:160960898567:function:sport-buds-api-dev-api:4",
+        "OutputValue": "arn:aws:lambda:us-east-2:160960898567:function:sport-buds-api-dev-api:5",
         "Description": "Current Lambda function version",
         "ExportName": "sls-sport-buds-api-dev-ApiLambdaFunctionQualifiedArn"
       },
@@ -867,7 +867,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-us-east-2-fbe78a57-bd35",
-              "S3Key": "serverless/sport-buds-api/dev/1765531885896-2025-12-12T09:31:25.896Z/sport-buds-api.zip"
+              "S3Key": "serverless/sport-buds-api/dev/1765591858000-2025-12-13T02:10:58.000Z/sport-buds-api.zip"
             },
             "Handler": "src/lambda.handler",
             "Runtime": "nodejs20.x",

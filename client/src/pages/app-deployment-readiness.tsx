@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseConfigError } from '@/lib/supabase'
 import { api } from '@/lib/api/client'
 import type { CorrelatedError } from '@/lib/api/http'
 import { clearAuthTokenOverride, setAuthTokenOverride } from '@/lib/api/http'
@@ -205,6 +205,22 @@ const downloadJson = (filename: string, data: unknown) => {
 }
 
 export const AppDeploymentReadinessPage = () => {
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center p-6">
+        <div className="w-full max-w-xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h1 className="text-lg font-semibold">Deployment Readiness</h1>
+          <p className="mt-2 text-sm text-slate-700">{supabaseConfigError ?? 'Missing Supabase environment variables'}</p>
+          <div className="mt-4 rounded-lg bg-slate-50 p-3 text-sm font-mono text-slate-700">
+            VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const sb = supabase
+
   const { user } = useAuth()
 
   const [checklist, setChecklist] = useState<ChecklistSection[]>(buildDefaultChecklist())
@@ -261,9 +277,13 @@ export const AppDeploymentReadinessPage = () => {
   useEffect(() => {
     let cancelled = false
     const run = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (cancelled) return
-      setAuthDebug({ session: data.session, refreshError: null })
+      try {
+        const { data } = await sb.auth.getSession()
+        if (cancelled) return
+        setAuthDebug({ session: data.session })
+      } catch (err) {
+        setAuthDebug({ session: null, refreshError: (err as Error).message })
+      }
     }
     run()
     return () => {
@@ -325,11 +345,14 @@ export const AppDeploymentReadinessPage = () => {
 
   const refreshSession = async () => {
     try {
-      const { data, error } = await supabase.auth.refreshSession()
-      if (error) throw error
+      const { data, error } = await sb.auth.refreshSession()
+      if (error) {
+        setAuthDebug({ session: null, refreshError: error.message })
+        return
+      }
       setAuthDebug({ session: data.session, refreshError: null })
-    } catch (err: any) {
-      setAuthDebug((p) => ({ ...p, refreshError: err?.message ?? 'Failed to refresh session' }))
+    } catch (err) {
+      setAuthDebug({ session: null, refreshError: (err as Error).message })
     }
   }
 

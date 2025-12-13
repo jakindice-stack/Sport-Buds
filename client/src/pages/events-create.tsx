@@ -10,7 +10,7 @@ const schema = z
   .object({
     title: z.string().min(1, 'Title is required'),
     sport: z.string().min(1, 'Sport is required'),
-    description: z.string().min(1, 'Event type/details are required'),
+    details: z.string().min(1, 'Event type/details are required'),
     start_time: z.string().min(1, 'Start time is required'),
     end_time: z.string().min(1, 'End time is required'),
     location: z.string().min(1, 'Location is required'),
@@ -53,7 +53,7 @@ export const CreateEventPage = () => {
     defaultValues: {
       title: '',
       sport: '',
-      description: '',
+      details: '',
       start_time: '',
       end_time: '',
       location: '',
@@ -93,7 +93,7 @@ export const CreateEventPage = () => {
     const payload: CreateEventPayload = {
       title: values.title,
       sport: values.sport,
-      description: values.description,
+      details: values.details,
       start_time: values.start_time,
       end_time: values.end_time,
       location: values.location,
@@ -117,7 +117,7 @@ export const CreateEventPage = () => {
     }
 
     setStatus({ type: 'success', message: 'Event created successfully.' })
-    navigate('/discover/map')
+    navigate('/app/find-events')
   })
 
   const { errors, isSubmitting } = form.formState
@@ -162,11 +162,11 @@ export const CreateEventPage = () => {
           Event type/details
           <textarea
             rows={3}
-            {...form.register('description')}
+            {...form.register('details')}
             className="rounded-2xl border border-[var(--sb-border)] bg-white px-4 py-3 text-base text-[var(--sb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--sb-accent)]"
             placeholder="Match, practice, or tournament details..."
           />
-          {errors.description && <span className="text-xs text-rose-600">{errors.description.message}</span>}
+          {errors.details && <span className="text-xs text-rose-600">{errors.details.message}</span>}
         </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium text-[var(--sb-text)]">

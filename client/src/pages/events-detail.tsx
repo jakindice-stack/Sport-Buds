@@ -212,7 +212,7 @@ export const EventDetailsPage = () => {
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-3xl border border-[var(--sb-border)] bg-white/80 p-6">
             <h3 className="font-display text-2xl font-semibold text-[var(--sb-text)]">Description</h3>
-            <p className="mt-3 text-[var(--sb-muted)]">{event.description}</p>
+            <p className="mt-3 text-[var(--sb-muted)]">{event.details}</p>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-[var(--sb-border)] bg-white/60 p-4">
